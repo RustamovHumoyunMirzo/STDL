@@ -1,0 +1,69 @@
+scene v1
+
+// Root player node with global ID
+node player MyPlayer @1
+{
+    health = 100
+    armor = 72.65
+    skin = "plyrnew.mat"
+    isBlocked = false
+
+    // Achievements include numbers, strings, booleans, and a local reference by local ID #12
+    achievements = [
+        0, 1, 2, 42, 23,
+        "232",
+        true,
+        <#12>          // local ID reference, resolved in player node type
+    ]
+
+    // Another list with global reference and typed reference with local ID
+    another_list = [
+        <mynode:MyNode @99>,    // global reference to MyNode @99 anywhere
+        <mynode:MyNode #12>     // local reference to MyNode #12 within type mynode
+    ]
+
+    // Nested child node with local ID
+    node mynode MyNode #12
+    {
+        description = "This is a nested node."
+        active = true
+    }
+}
+
+// Enemy node with local ID, no global ID
+node enemy Goblin #12
+{
+    health = 50
+    aggressive = true
+    loot = [
+        "gold_coin",
+        "dagger",
+        <player:MyPlayer @1>    // reference to player by global ID
+    ]
+}
+
+// Another node of type mynode with global ID
+node mynode MyNode @99
+{
+    description = "Global MyNode used in references"
+    value = 123.45
+}
+
+// Node without ID (just type + name)
+node environment Forest
+{
+    weather = "rainy"
+    difficulty = 3
+
+    node tree Oak
+    {
+        height = 15
+        leaves = true
+    }
+
+    node tree Pine
+    {
+        height = 20
+        leaves = false
+    }
+}
