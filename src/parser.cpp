@@ -117,10 +117,11 @@ template<> struct Action<grammar::list>{
         if(state.nodeStack.empty()) return;
 
         NodePtr node = state.nodeStack.back();
-        Value val = node->properties["_last_value"];
-
-        if(!std::holds_alternative<std::vector<Value>>(val)){
-            node->properties["_last_value"] = std::vector<Value>{val};
+        if(node->properties.find("_last_value") != node->properties.end()){
+            Value last = node->properties["_last_value"];
+            if(!std::holds_alternative<std::vector<Value>>(last)){
+                node->properties["_last_value"] = Value{ std::vector<Value>{last} };
+            }
         }
     }
 };
