@@ -2,7 +2,7 @@
 #include <iostream>
 
 int main(){
-    auto scene = STDL::LoadFile("C:\\Users\\Humoy\\Projects\\STDL\\STDL\\examples\\example.stdl");
+    auto scene = STDL::LoadFile("example.stdl");
     if(!scene){
         std::cerr << "Failed to load STDL file\n";
         return 1;
