@@ -3,6 +3,7 @@
 #include "stdl.hpp"
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 namespace STDL {
 
@@ -17,7 +18,7 @@ ScenePtr LoadFile(const std::string& path){
 ScenePtr LoadString(const std::string& content){
     ScenePtr scene = std::make_shared<Scene>();
     if(!STDLParser::ParseSTDL(content, *scene)){
-        std::cerr << "Failed to parse STDL content!\n";
+        std::cerr << "Failed to parse STDL content\n";
         return nullptr;
     }
     return scene;
@@ -32,11 +33,11 @@ bool SaveFile(const ScenePtr& scene, const std::string& path){
 
 namespace {
 std::string valueToString(const Value& val){
-    if (std::holds_alternative<int>(val)) return std::to_string(std::get<int>(val));
-    if (std::holds_alternative<double>(val)) return std::to_string(std::get<double>(val));
-    if (std::holds_alternative<bool>(val)) return std::get<bool>(val) ? "true" : "false";
-    if (std::holds_alternative<std::string>(val)) return "\"" + std::get<std::string>(val) + "\"";
-    if (std::holds_alternative<Ref>(val)){
+    if(std::holds_alternative<int>(val)) return std::to_string(std::get<int>(val));
+    if(std::holds_alternative<double>(val)) return std::to_string(std::get<double>(val));
+    if(std::holds_alternative<bool>(val)) return std::get<bool>(val) ? "true" : "false";
+    if(std::holds_alternative<std::string>(val)) return "\"" + std::get<std::string>(val) + "\"";
+    if(std::holds_alternative<Ref>(val)){
         auto& r = std::get<Ref>(val);
         std::string s = "<";
         if(r.type) s += *r.type + ":";
@@ -46,12 +47,12 @@ std::string valueToString(const Value& val){
         s += ">";
         return s;
     }
-    if (std::holds_alternative<std::vector<std::shared_ptr<ValueNode>>>(val)){
+    if(std::holds_alternative<std::vector<std::shared_ptr<ValueNode>>>(val)){
         auto& vec = std::get<std::vector<std::shared_ptr<ValueNode>>>(val);
         std::string s = "[";
         for(size_t i = 0; i < vec.size(); ++i){
             s += valueToString(vec[i]->value);
-            if(i + 1 < vec.size()) s += ", ";
+            if(i+1 < vec.size()) s += ", ";
         }
         s += "]";
         return s;
@@ -65,12 +66,17 @@ void serializeNode(const NodePtr& node, std::ostream& os, int indent=0){
     if(node->globalID) os << " @" << *node->globalID;
     if(node->localID) os << " #" << *node->localID;
     os << "\n" << ind << "{\n";
-    for(auto& [k,v]: node->properties){
+
+    for (auto it = node->properties.begin(); it != node->properties.end(); ++it) {
+        const std::string& k = it->first;
+        Value& v = it->second;
         os << ind << "  " << k << " = " << valueToString(v) << "\n";
     }
-    for(auto& c: node->children){
-        serializeNode(c, os, indent+2);
+
+    for (auto& c : node->children) {
+        serializeNode(c, os, indent + 2);
     }
+
     os << ind << "}\n";
 }
 }

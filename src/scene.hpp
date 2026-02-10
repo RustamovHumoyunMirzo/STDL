@@ -5,7 +5,6 @@
 #include <map>
 #include <memory>
 #include <optional>
-#include <iostream>
 
 struct Node;
 using NodePtr = std::shared_ptr<Node>;
@@ -18,7 +17,6 @@ struct Ref {
 };
 
 struct ValueNode;
-
 using Value = std::variant<
     int,
     double,
@@ -40,14 +38,14 @@ struct Node {
     std::map<std::string, Value> properties;
     std::vector<NodePtr> children;
 
-    NodePtr getChild(const std::string& childName) {
+    NodePtr getChild(const std::string& childName){
         for(auto& c: children)
             if(c->name == childName) return c;
         return nullptr;
     }
 
     template<typename T>
-    bool get(const std::string& key, T& out) {
+    bool get(const std::string& key, T& out){
         auto it = properties.find(key);
         if(it != properties.end() && std::holds_alternative<T>(it->second)){
             out = std::get<T>(it->second);
@@ -57,11 +55,11 @@ struct Node {
     }
 
     template<typename T>
-    void set(const std::string& key, T val) {
+    void set(const std::string& key, T val){
         properties[key] = val;
     }
 
-    void addChild(const NodePtr& child) {
+    void addChild(const NodePtr& child){
         children.push_back(child);
     }
 };
@@ -69,7 +67,7 @@ struct Node {
 struct Scene {
     std::vector<NodePtr> nodes;
 
-    NodePtr getNodeByName(const std::string& name) {
+    NodePtr getNodeByName(const std::string& name){
         for(auto& n: nodes)
             if(n->name == name) return n;
         return nullptr;
@@ -79,3 +77,5 @@ struct Scene {
         nodes.push_back(node);
     }
 };
+
+using ScenePtr = std::shared_ptr<Scene>;

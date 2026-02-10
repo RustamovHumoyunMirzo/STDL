@@ -1,0 +1,5 @@
+scene v1
+node enemy Orc
+{
+  health = 80
+}

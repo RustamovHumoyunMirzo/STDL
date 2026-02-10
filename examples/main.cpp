@@ -4,25 +4,25 @@
 int main(){
     auto scene = STDL::LoadFile("example.stdl");
     if(!scene){
-        std::cerr << "Failed to load STDL file\n";
+        std::cerr<<"Failed to load STDL file\n";
         return 1;
     }
 
     auto player = scene->getNodeByName("MyPlayer");
     if(player){
+        std::cout<<"Player found! Type: "<<player->type<<"\n";
         int health;
-        if(player->get("health", health))
-            std::cout << "Player health = " << health << "\n";
+        if(player->get("health",health))
+            std::cout<<"Player health = "<<health<<"\n";
     }
 
     auto enemy = std::make_shared<Node>();
-    enemy->type = "enemy";
-    enemy->name = "Orc";
-    enemy->set("health", 80);
+    enemy->type="enemy";
+    enemy->name="Orc";
+    enemy->set("health",80);
     scene->addNode(enemy);
 
-    STDL::SaveFile(scene, "out.stdl");
-
-    std::cout << "Saved scene to out.stdl\n";
+    STDL::SaveFile(scene,"out.stdl");
+    std::cout<<"Saved scene to out.stdl\n";
     return 0;
 }
