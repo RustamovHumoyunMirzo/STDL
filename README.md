@@ -349,10 +349,6 @@ Contributions are welcome! Please ensure:
 - New features include tests
 - Documentation is updated
 
-## License
-
-[Specify your license here]
-
 ## Acknowledgments
 
 Built with [PEGTL](https://github.com/taocpp/PEGTL) - Parsing Expression Grammar Template Library
