@@ -66,9 +66,13 @@ template<> struct Action<grammar::property>{
         std::string key = line.substr(0, eq);
         key.erase(0,key.find_first_not_of(" \t\r\n"));
         key.erase(key.find_last_not_of(" \t\r\n")+1);
+        
         auto it = node->properties.find("_last_value");
         if(it != node->properties.end()){
-            node->properties[key] = it->second;
+            auto& vec = std::get<std::vector<std::shared_ptr<ValueNode>>>(it->second);
+            if(!vec.empty()){
+                node->properties[key] = vec[0]->value;
+            }
             node->properties.erase("_last_value");
         }
     }
