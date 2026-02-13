@@ -24,10 +24,10 @@ struct key : pegtl::plus<pegtl::alpha> {};
 struct property : pegtl::seq<key, opt_ws, pegtl::one<'='>, opt_ws, value> {};
 struct node;
 struct nodes : pegtl::star<pegtl::sor<node, property, comment, ws>> {};
-struct node : pegtl::seq<pegtl::string<'n','o','d','e'>, ws, pegtl::plus<pegtl::not_one<'{'>>, pegtl::one<'{'>, nodes, pegtl::one<'}'>> {};
-struct scene : pegtl::seq<pegtl::string<'s','c','e','n','e',' ','v','1'>, nodes> {};
+struct node_header : pegtl::seq<pegtl::string<'n','o','d','e'>, ws, pegtl::plus<pegtl::not_one<'{', '\n', '\r'>>, opt_ws> {};
+struct node : pegtl::seq<node_header, pegtl::one<'{'>, nodes, pegtl::one<'}'>> {};
+struct scene : pegtl::seq<pegtl::string<'s','c','e','n','e',' ','v','1'>, pegtl::star<pegtl::sor<ws, comment>>, nodes> {};
 }
 
 bool ParseSTDL(const std::string& input, Scene& scene);
-
 }

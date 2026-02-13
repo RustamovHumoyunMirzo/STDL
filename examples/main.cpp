@@ -9,12 +9,10 @@ int main(){
     }
 
     auto player = scene->getNodeByName("MyPlayer");
-    if(player){
-        std::cout<<"Player found! Type: "<<player->type<<"\n";
-        int health;
-        if(player->get("health",health))
-            std::cout<<"Player health = "<<health<<"\n";
-    }
+    std::cout<<"Player found! Type: "<<player->type<<"\n";
+    int health;
+    if(player->get("health",health))
+        std::cout<<"Player health = "<<health<<"\n";
 
     auto enemy = std::make_shared<Node>();
     enemy->type="enemy";

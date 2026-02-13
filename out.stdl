@@ -1,4 +1,12 @@
 scene v1
+node player MyPlayer @1
+{
+  _last_value = [0]
+  armor = [72.650000]
+  health = [100]
+  isBlocked = [false]
+  skin = ["plyrnew.mat"]
+}
 node enemy Orc
 {
   health = 80

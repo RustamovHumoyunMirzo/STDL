@@ -73,15 +73,58 @@ template<> struct Action<grammar::property>{
         }
     }
 };
-template<> struct Action<grammar::node> {
+template<> struct Action<grammar::node_header> {
     template<typename Input>
     static void apply(const Input& in, ParserState& state){
-        std::istringstream ss(in.string());
+        std::string text = in.string();
+        
+        text.erase(0, text.find_first_not_of(" \t\r\n"));
+        text.erase(text.find_last_not_of(" \t\r\n") + 1);
+        
+        std::istringstream ss(text);
         std::string tmp, type, name;
         ss >> tmp >> type >> name;
+        
         NodePtr node = std::make_shared<Node>();
         node->type = type;
         node->name = name;
+        
+        std::string token;
+        while(ss >> token){
+            if(token[0]=='@') node->globalID = std::stoi(token.substr(1));
+            else if(token[0]=='#') node->localID = std::stoi(token.substr(1));
+        }
+
+        if(state.nodeStack.empty()){
+            state.scene->addNode(node);
+        } else {
+            state.nodeStack.back()->addChild(node);
+        }
+
+        state.nodeStack.push_back(node);
+    }
+};
+template<> struct Action<grammar::node> {
+    template<typename Input>
+    static void apply(const Input& in, ParserState& state){
+        std::string text = in.string();
+        
+        size_t brace = text.find('{');
+        if(brace != std::string::npos) {
+            text = text.substr(0, brace);
+        }
+        
+        text.erase(0, text.find_first_not_of(" \t\r\n"));
+        text.erase(text.find_last_not_of(" \t\r\n") + 1);
+        
+        std::istringstream ss(text);
+        std::string tmp, type, name;
+        ss >> tmp >> type >> name;
+        
+        NodePtr node = std::make_shared<Node>();
+        node->type = type;
+        node->name = name;
+        
         std::string token;
         while(ss >> token){
             if(token[0]=='@') node->globalID = std::stoi(token.substr(1));
