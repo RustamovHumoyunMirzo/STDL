@@ -1,354 +1,265 @@
-# STDL - Scene Tree Description Language
+# STDL - Simple Tree Description Language
 
-A C++ library for parsing and serializing hierarchical scene descriptions using a custom domain-specific language.
+A lightweight C++ parser for hierarchical scene data. Think JSON, but designed specifically for game scenes and structured data with cross-references.
 
-## Overview
+## Why STDL?
 
-STDL provides a lightweight, human-readable format for describing scene graphs and hierarchical data structures. It's designed for applications that need to define complex object hierarchies with properties, such as 3D scenes, UI layouts, or configuration systems.
+I got tired of wrestling with JSON and XML for game scenes. STDL is what I wish existed when I started - simple syntax, built-in references between objects, and actually readable by humans.
+```stdl
+scene v1
+
+node player Hero @1
+{
+    health = 100
+    position = [10.5, 20.0, 5.5]
+    
+    node weapon Sword #10
+    {
+        damage = 25
+        durability = 100
+    }
+}
+
+node enemy Goblin @2
+{
+    health = 50
+    target = <player:Hero @1>    // reference to the player
+    weapon = <#10>                 // reference to local weapon
+}
+```
 
 ## Features
 
-- **Simple Syntax**: Clean, readable format inspired by configuration languages
-- **Hierarchical Structure**: Natural tree representation with parent-child relationships
-- **Rich Data Types**: Support for integers, floats, booleans, strings, lists, and references
-- **Node References**: Local (`#ID`) and global (`@ID`) reference system
-- **Header-only API**: Simple integration with `#include "stdl.hpp"`
-- **PEG Parser**: Built on PEGTL for robust parsing
+- **Clean syntax** - No angle brackets everywhere, no closing tags
+- **Hierarchical nodes** - Nest as deep as you want
+- **Type safety** - Integers, floats, booleans, strings, and lists
+- **References** - Link objects using IDs instead of duplicating data
+- **Comments** - Because code without comments is just cruel
 
-## Language Syntax
+## Building
+
+You need CMake 3.15+ and a C++17 compiler.
+```bash
+git clone https://github.com/RustamovHumoyunMirzo/STDL.git
+cd STDL
+git submodule update --init --recursive  # Get PEGTL
+mkdir build && cd build
+cmake ..
+cmake --build .
+```
+
+## Quick Start
+```cpp
+#include "stdl.hpp"
+
+// Load a scene
+auto scene = STDL::LoadFile("level1.stdl");
+if(!scene) {
+    // handle error
+}
+
+// Find nodes
+auto player = scene->getNodeByName("Hero");
+
+// Read properties
+int health;
+if(player->get("health", health)) {
+    std::cout << "Player health: " << health << "\n";
+}
+
+// Navigate children
+auto weapon = player->getChild("Sword");
+
+// Modify and save
+player->set("health", 150);
+STDL::SaveFile(scene, "level1_modified.stdl");
+```
+
+## Syntax Guide
 
 ### Basic Structure
 
-```
+Every file starts with `scene v1` followed by your nodes:
+```stdl
 scene v1
-node NodeType NodeName @globalID #localID
+
+node type_name NodeName
 {
-    propertyName = value
-    node ChildType ChildName
-    {
-        // child properties
-    }
+    // properties and child nodes
 }
 ```
 
-### Example
-
-```
-scene v1
-node Transform root @1 #1
-{
-    position = [0.0, 1.5, 0.0]
-    rotation = [0.0, 0.0, 0.0]
-    scale = [1.0, 1.0, 1.0]
-    
-    node Mesh cube @2 #2
-    {
-        vertices = 8
-        material = "default"
-        visible = true
-        parentTransform = <Transform:root @1>
-    }
-    
-    node Light mainLight @3 #3
-    {
-        intensity = 1.0
-        color = [255, 255, 255]
-        type = "directional"
-    }
-}
+### Properties
+```stdl
+name = "Alice"              // string
+health = 100                // integer
+armor = 25.5                // float
+alive = true                // boolean
+position = [0, 10, 0]       // list
 ```
 
-### Data Types
+### Node IDs
 
-| Type | Example | Description |
-|------|---------|-------------|
-| Integer | `42` | Whole numbers |
-| Float | `3.14` | Decimal numbers |
-| Boolean | `true`, `false` | Boolean values |
-| String | `"hello world"` | Quoted text |
-| List | `[1, 2, 3]` | Arrays of values |
-| Local Ref | `<#5>` | Reference by local ID |
-| Global Ref | `<Type:name @10>` | Reference by type, name, and global ID |
+Nodes can have local IDs (unique within their type) or global IDs (unique across the whole scene):
+```stdl
+node player Hero @1         // global ID 1
+node weapon Sword #10       // local ID 10
+```
 
 ### References
 
-STDL supports two types of node references:
-
-- **Local References**: `<#localID>` - References within the same file
-- **Global References**: `<Type:name @globalID>` - References with type and name information
-
-## Installation
-
-### Requirements
-
-- C++17 or later
-- [PEGTL](https://github.com/taocpp/PEGTL) library
-
-### Building
-
-```bash
-mkdir build
-cd build
-cmake ..
-make
+Point to other nodes using their IDs:
+```stdl
+target = <player:Hero @1>        // reference by global ID
+equipped = <weapon:Sword #10>    // reference by local ID  
+quick_ref = <#10>                // short form for local ID
 ```
 
-### Integration
-
-Include the library in your project:
-
-```cpp
-#include "stdl.hpp"
+### Comments
+```stdl
+// This is a comment
+health = 100  // inline comment works too
 ```
 
-## API Reference
+### Lists
 
-### Loading Scenes
-
-#### Load from File
-
-```cpp
-STDL::ScenePtr scene = STDL::LoadFile("path/to/scene.stdl");
-if (scene) {
-    // Process scene
-}
+Lists can contain any mix of types:
+```stdl
+mixed = [1, 2.5, "text", true, <#12>]
 ```
 
-#### Load from String
-
-```cpp
-std::string content = R"(
-scene v1
-node Object root @1
+### Nested Nodes
+```stdl
+node player Hero
 {
-    name = "example"
-}
-)";
-
-STDL::ScenePtr scene = STDL::LoadString(content);
-```
-
-### Saving Scenes
-
-#### Save to File
-
-```cpp
-bool success = STDL::SaveFile(scene, "output.stdl");
-```
-
-#### Convert to String
-
-```cpp
-std::string content = STDL::ToString(scene);
-```
-
-### Working with Nodes
-
-#### Access Nodes
-
-```cpp
-// Get node by name
-NodePtr node = scene->getNodeByName("root");
-
-// Access child nodes
-NodePtr child = node->getChild("childName");
-
-// Iterate through all nodes
-for (auto& node : scene->nodes) {
-    std::cout << node->name << std::endl;
-}
-```
-
-#### Read Properties
-
-```cpp
-int value;
-if (node->get("propertyName", value)) {
-    // Use value
-}
-
-std::string text;
-node->get("name", text);
-
-double position;
-node->get("x", position);
-```
-
-#### Set Properties
-
-```cpp
-node->set("health", 100);
-node->set("name", std::string("player"));
-node->set("active", true);
-node->set("position", 3.14);
-```
-
-#### Add Children
-
-```cpp
-auto child = std::make_shared<Node>();
-child->type = "Transform";
-child->name = "childNode";
-node->addChild(child);
-```
-
-### Node Structure
-
-```cpp
-struct Node {
-    std::string type;                    // Node type
-    std::string name;                    // Node name
-    std::optional<int> localID;          // Local identifier
-    std::optional<int> globalID;         // Global identifier
-    std::map<std::string, Value> properties;  // Key-value properties
-    std::vector<NodePtr> children;       // Child nodes
-};
-```
-
-### Value Types
-
-The `Value` type is a variant that can hold:
-
-```cpp
-std::variant<
-    int,
-    double,
-    bool,
-    std::string,
-    Ref,
-    std::vector<std::shared_ptr<ValueNode>>
->
-```
-
-## Use Cases
-
-### 3D Scene Graphs
-
-```
-scene v1
-node Scene world @1
-{
-    node Camera main @2
-    {
-        fov = 60.0
-        position = [0.0, 5.0, 10.0]
-        target = [0.0, 0.0, 0.0]
-    }
+    health = 100
     
-    node Model character @3
+    node inventory Backpack
     {
-        mesh = "character.obj"
-        texture = "character.png"
-        position = [0.0, 0.0, 0.0]
-    }
-}
-```
-
-### UI Hierarchy
-
-```
-scene v1
-node Window mainWindow @1
-{
-    width = 800
-    height = 600
-    title = "Application"
-    
-    node Panel sidebar @2
-    {
-        position = [0, 0]
-        size = [200, 600]
+        capacity = 20
         
-        node Button btn1 @3
+        node item Potion
         {
-            text = "Click Me"
-            enabled = true
+            quantity = 5
         }
     }
 }
 ```
 
-### Configuration System
+## API Reference
 
+### Loading & Saving
+```cpp
+ScenePtr LoadFile(const std::string& path);
+ScenePtr LoadString(const std::string& content);
+bool SaveFile(const ScenePtr& scene, const std::string& path);
+std::string ToString(const ScenePtr& scene);
 ```
-scene v1
-node Config app @1
+
+### Scene Methods
+```cpp
+NodePtr getNodeByName(const std::string& name);
+void addNode(const NodePtr& node);
+```
+
+### Node Methods
+```cpp
+// Get child by name
+NodePtr getChild(const std::string& childName);
+
+// Read property
+template<typename T>
+bool get(const std::string& key, T& out);
+
+// Write property
+template<typename T>
+void set(const std::string& key, T val);
+
+// Add child node
+void addChild(const NodePtr& child);
+```
+
+### Node Fields
+```cpp
+std::string type;                           // node type
+std::string name;                           // node name
+std::optional<int> localID;                 // local ID if set
+std::optional<int> globalID;                // global ID if set
+std::map<std::string, Value> properties;    // all properties
+std::vector<NodePtr> children;              // child nodes
+```
+
+## Example Use Cases
+
+**Game Configuration:**
+```stdl
+node config GameSettings
 {
-    version = "1.0.0"
-    debug = false
+    resolution = [1920, 1080]
+    fullscreen = true
+    fov = 90.5
+}
+```
+
+**Level Data:**
+```stdl
+node level "Forest Entrance"
+{
+    difficulty = 2
     
-    node Database db @2
+    node spawn PlayerSpawn
     {
-        host = "localhost"
-        port = 5432
-        name = "mydb"
+        position = [0, 0, 0]
+        rotation = [0, 90, 0]
     }
     
-    node Server web @3
+    node enemy Goblin @100
     {
-        port = 8080
-        workers = 4
+        health = 50
+        patrol_points = [
+            [10, 0, 5],
+            [20, 0, 5],
+            [20, 0, 15]
+        ]
     }
 }
 ```
 
-## Advanced Features
-
-### Comments
-
-```
-scene v1
-// This is a comment
-node Object test @1
+**Dialogue Trees:**
+```stdl
+node dialogue "Meet the Merchant"
 {
-    // Comments can appear anywhere
-    value = 42
+    text = "Welcome, traveler! Care to see my wares?"
+    
+    node choice "Yes" #1
+    {
+        text = "Show me what you have."
+        next = <#2>
+    }
+    
+    node choice "No" #2
+    {
+        text = "Maybe later."
+    }
 }
 ```
 
-### Nested Lists
+## Limitations
 
-```
-matrix = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
-```
+- Property names must start with a letter and can only contain letters, numbers, and underscores
+- No negative numbers yet (use strings as a workaround: `damage = "-10"`)
+- No escape sequences in strings (no `\n`, `\t`, etc.)
+- References aren't automatically resolved - you have to look them up yourself
 
-### Reference System
+## Dependencies
 
-```cpp
-// Create a reference
-Ref ref;
-ref.globalID = 5;
-ref.type = "Transform";
-ref.name = "target";
-node->set("reference", ref);
-```
-
-## Error Handling
-
-The parser provides error messages for invalid syntax:
-
-```cpp
-STDL::ScenePtr scene = STDL::LoadFile("invalid.stdl");
-if (!scene) {
-    // Parse error occurred, check stderr for details
-}
-```
-
-## Performance Considerations
-
-- Parsing is single-threaded
-- Memory usage scales with scene complexity
-- References are stored as values, not resolved pointers
-- Suitable for scenes with thousands of nodes
+- [PEGTL](https://github.com/taocpp/PEGTL) - Parser combinator library (included as submodule)
+- C++17 standard library
 
 ## Contributing
 
-Contributions are welcome! Please ensure:
+Found a bug? Have an idea? Open an issue or PR. This started as a weekend project, so there's plenty of room for improvement.
 
-- Code follows existing style conventions
-- New features include tests
-- Documentation is updated
+## Why "STDL"?
 
-## Acknowledgments
-
-Built with [PEGTL](https://github.com/taocpp/PEGTL) - Parsing Expression Grammar Template Library
+Simple Tree Description Language. Yeah, I'm not great at naming things. If you have a better name, I'm all ears.
