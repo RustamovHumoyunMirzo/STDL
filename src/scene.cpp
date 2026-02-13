@@ -32,18 +32,26 @@ bool SaveFile(const ScenePtr& scene, const std::string& path){
 }
 
 namespace {
+namespace {
 std::string valueToString(const Value& val){
     if(std::holds_alternative<int>(val)) return std::to_string(std::get<int>(val));
-    if(std::holds_alternative<double>(val)) return std::to_string(std::get<double>(val));
+    if(std::holds_alternative<double>(val)){
+        std::ostringstream oss;
+        oss << std::get<double>(val);
+        return oss.str();
+    }
     if(std::holds_alternative<bool>(val)) return std::get<bool>(val) ? "true" : "false";
     if(std::holds_alternative<std::string>(val)) return "\"" + std::get<std::string>(val) + "\"";
     if(std::holds_alternative<Ref>(val)){
         auto& r = std::get<Ref>(val);
         std::string s = "<";
-        if(r.type) s += *r.type + ":";
-        if(r.name) s += *r.name;
-        if(r.globalID) s += " @" + std::to_string(*r.globalID);
-        else if(r.localID) s += " #" + std::to_string(*r.localID);
+        if(r.type) s += *r.type;
+        if(r.localID){
+            s += "#" + std::to_string(*r.localID);
+        } else if(r.globalID){
+            if(r.name) s += ":" + *r.name;
+            s += " @" + std::to_string(*r.globalID);
+        }
         s += ">";
         return s;
     }
@@ -58,6 +66,7 @@ std::string valueToString(const Value& val){
         return s;
     }
     return "";
+}
 }
 
 void serializeNode(const NodePtr& node, std::ostream& os, int indent=0){
