@@ -1,11 +1,44 @@
 scene v1
 node player MyPlayer @1
 {
-  _last_value = [0]
+  achievements = [0, 1, 2, 42, 23, "232", true, < #12>]
+  another_list = <mynode:MyNode @99>,    // global reference to MyNode @99 anywhere
+        <mynode:MyNode : #12>
   armor = 72.650000
   health = 100
   isBlocked = false
   skin = "plyrnew.mat"
+  node mynode MyNode #12
+  {
+    active = true
+    description = "This is a nested node."
+  }
+}
+node enemy Goblin #12
+{
+  aggressive = true
+  health = 50
+  loot = ["gold_coin", "dagger", <player:MyPlayer @1>]
+}
+node mynode MyNode @99
+{
+  description = "Global MyNode used in references"
+  value = 123.450000
+}
+node environment Forest
+{
+  difficulty = 3
+  weather = "rainy"
+  node tree Oak
+  {
+    height = 15
+    leaves = true
+  }
+  node tree Pine
+  {
+    height = 20
+    leaves = false
+  }
 }
 node enemy Orc
 {
