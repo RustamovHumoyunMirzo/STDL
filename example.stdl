@@ -3,7 +3,7 @@ scene v1
 // Root player node with global ID
 node player MyPlayer @1
 {
-    health = 100
+    health = -100
     armor = 72.65
     skin = "plyrnew.mat"
     isBlocked = false

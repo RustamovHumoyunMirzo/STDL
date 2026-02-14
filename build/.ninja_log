@@ -1,0 +1,5 @@
+# ninja log v7
+59	2651	7927890378683358	CMakeFiles/STDL.dir/examples/main.cpp.obj	1f3c8caa340030db
+36	4573	7927890378441586	CMakeFiles/STDL.dir/src/scene.cpp.obj	9dd537c71c586648
+49	8450	7927890378573248	CMakeFiles/STDL.dir/src/parser.cpp.obj	73e957f90c3733c2
+8451	8859	7927890462582285	STDL.exe	bae7fb3569e003a5

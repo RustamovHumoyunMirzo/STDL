@@ -13,8 +13,9 @@ struct opt_ws : pegtl::star<pegtl::sor<pegtl::space, comment>> {};
 struct ws_or_comment : pegtl::sor<ws, comment> {};
 struct opt_ws_or_comment : pegtl::star<pegtl::sor<pegtl::space, comment>> {};
 
-struct integer : pegtl::plus<pegtl::digit> {};
-struct floating : pegtl::seq<pegtl::plus<pegtl::digit>, pegtl::one<'.'>, pegtl::plus<pegtl::digit>> {};
+struct sign : pegtl::opt<pegtl::one<'-', '+'>> {};
+struct integer : pegtl::seq<sign, pegtl::plus<pegtl::digit>> {};
+struct floating : pegtl::seq<sign, pegtl::plus<pegtl::digit>, pegtl::one<'.'>, pegtl::plus<pegtl::digit>> {};
 struct boolean : pegtl::sor<pegtl::string<'t','r','u','e'>, pegtl::string<'f','a','l','s','e'>> {};
 struct quoted_string : pegtl::seq<pegtl::one<'"'>, pegtl::star<pegtl::not_one<'"'>>, pegtl::one<'"'>> {};
 struct local_ref : pegtl::seq<pegtl::one<'<'>, pegtl::opt<pegtl::plus<pegtl::not_one<'#', '>', ',', '\n', '\r'>>>, pegtl::one<'#'>, pegtl::plus<pegtl::digit>, pegtl::one<'>'>> {};
