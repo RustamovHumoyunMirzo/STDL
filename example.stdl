@@ -7,6 +7,7 @@ node player MyPlayer @1
     armor = 72.65
     skin = "plyrnew.mat"
     isBlocked = false
+    escaped = "Hello\nWorld\t\"Quoted\""
 
     // Achievements include numbers, strings, booleans, and a local reference by local ID #12
     achievements = [

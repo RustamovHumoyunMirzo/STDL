@@ -20,6 +20,13 @@ int main(){
     if(player->get("health",health))
         std::cout<<"Player health = "<<health<<"\n";
 
+    std::string escaped;
+    if (player->get("escaped",escaped))
+    {
+        std::cout << "Test escaped: " << escaped << "\n";
+    }
+    
+
     auto forest = scene->getNodeByName("Forest");
     if(!forest){
         std::cerr << "Forest not found!\n";

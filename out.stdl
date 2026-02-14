@@ -4,6 +4,7 @@ node player MyPlayer @1
   achievements = [0, 1, 2, 42, 23, "232", true, <#12>]
   another_list = [<mynode:MyNode @99>, <mynode:MyNode #12>]
   armor = 72.65
+  escaped = "Hello\nWorld\t\"Quoted\""
   health = -100
   isBlocked = false
   skin = "plyrnew.mat"

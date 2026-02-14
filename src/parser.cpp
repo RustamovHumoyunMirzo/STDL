@@ -14,8 +14,28 @@ struct ParserState {
 };
 
 inline std::string unquote(const std::string& str){
-    if(str.size()>=2 && str.front()=='"' && str.back()=='"') return str.substr(1,str.size()-2);
-    return str;
+    if(str.size() < 2 || str.front() != '"' || str.back() != '"') 
+        return str;
+    
+    std::string result;
+    result.reserve(str.size() - 2);
+    
+    for(size_t i = 1; i < str.size() - 1; ++i){
+        if(str[i] == '\\' && i + 1 < str.size() - 1){
+            switch(str[i + 1]){
+                case 'n': result += '\n'; break;
+                case 't': result += '\t'; break;
+                case 'r': result += '\r'; break;
+                case '"': result += '"'; break;
+                case '\\': result += '\\'; break;
+                default: result += str[i + 1]; break;
+            }
+            ++i;
+        } else {
+            result += str[i];
+        }
+    }
+    return result;
 }
 
 template<typename Rule>

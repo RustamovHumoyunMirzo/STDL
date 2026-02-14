@@ -41,7 +41,22 @@ std::string valueToString(const Value& val){
         return oss.str();
     }
     if(std::holds_alternative<bool>(val)) return std::get<bool>(val) ? "true" : "false";
-    if(std::holds_alternative<std::string>(val)) return "\"" + std::get<std::string>(val) + "\"";
+    if(std::holds_alternative<std::string>(val)){
+        auto& s = std::get<std::string>(val);
+        std::string escaped = "\"";
+        for(char c : s){
+            switch(c){
+                case '\n': escaped += "\\n"; break;
+                case '\t': escaped += "\\t"; break;
+                case '\r': escaped += "\\r"; break;
+                case '"': escaped += "\\\""; break;
+                case '\\': escaped += "\\\\"; break;
+                default: escaped += c; break;
+            }
+        }
+        escaped += "\"";
+        return escaped;
+    }
     if(std::holds_alternative<Ref>(val)){
         auto& r = std::get<Ref>(val);
         std::string s = "<";
