@@ -25,7 +25,6 @@ int main(){
     {
         std::cout << "Test escaped: " << escaped << "\n";
     }
-    
 
     auto forest = scene->getNodeByName("Forest");
     if(!forest){

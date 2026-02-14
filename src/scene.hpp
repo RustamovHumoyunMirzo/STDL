@@ -43,7 +43,11 @@ struct Node {
             if(c->name == childName) return c;
         return nullptr;
     }
-
+    
+    NodePtr getChildByLocalID(int localID){
+        return findChildByLocalID(children, localID, type);
+    }
+    
     template<typename T>
     bool get(const std::string& key, T& out){
         auto it = properties.find(key);
@@ -53,28 +57,72 @@ struct Node {
         }
         return false;
     }
-
+    
+    bool getRef(const std::string& key, Ref& out){
+        auto it = properties.find(key);
+        if(it != properties.end() && std::holds_alternative<Ref>(it->second)){
+            out = std::get<Ref>(it->second);
+            return true;
+        }
+        return false;
+    }
+    
+    NodePtr resolveRef(const Ref& ref, Scene* scene){
+        if(ref.globalID && scene){
+            return scene->getNodeByGlobalID(*ref.globalID);
+        }
+        if(ref.localID){
+            return getChildByLocalID(*ref.localID);
+        }
+        return nullptr;
+    }
+    
     template<typename T>
     void set(const std::string& key, T val){
         properties[key] = val;
     }
-
+    
     void addChild(const NodePtr& child){
         children.push_back(child);
+    }
+
+private:
+    NodePtr findChildByLocalID(const std::vector<NodePtr>& nodeList, int localID, const std::string& nodeType){
+        for(auto& n: nodeList){
+            if(n->type == nodeType && n->localID && *n->localID == localID) 
+                return n;
+            auto found = findChildByLocalID(n->children, localID, nodeType);
+            if(found) return found;
+        }
+        return nullptr;
     }
 };
 
 struct Scene {
     std::vector<NodePtr> nodes;
-
+    
     NodePtr getNodeByName(const std::string& name){
         for(auto& n: nodes)
             if(n->name == name) return n;
         return nullptr;
     }
-
+    
+    NodePtr getNodeByGlobalID(int globalID){
+        return findNodeByGlobalID(nodes, globalID);
+    }
+    
     void addNode(const NodePtr& node){
         nodes.push_back(node);
+    }
+
+private:
+    NodePtr findNodeByGlobalID(const std::vector<NodePtr>& nodeList, int globalID){
+        for(auto& n: nodeList){
+            if(n->globalID && *n->globalID == globalID) return n;
+            auto found = findNodeByGlobalID(n->children, globalID);
+            if(found) return found;
+        }
+        return nullptr;
     }
 };
 
