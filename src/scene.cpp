@@ -31,8 +31,6 @@ bool SaveFile(const ScenePtr& scene, const std::string& path){
     return true;
 }
 
-namespace {
-namespace {
 std::string valueToString(const Value& val){
     if(std::holds_alternative<int>(val)) return std::to_string(std::get<int>(val));
     if(std::holds_alternative<double>(val)){
@@ -82,8 +80,8 @@ std::string valueToString(const Value& val){
     }
     return "";
 }
-}
 
+namespace {
 void serializeNode(const NodePtr& node, std::ostream& os, int indent=0){
     std::string ind(indent,' ');
     os << ind << "node " << node->type << " " << node->name;
@@ -113,5 +111,15 @@ std::string ToString(const ScenePtr& scene){
     }
     return os.str();
 }
+}
 
+NodePtr Node::resolveRef(const Ref& ref, Scene* scene)
+{
+    if (ref.globalID && scene) {
+        return scene->getNodeByGlobalID(*ref.globalID);
+    }
+    if (ref.localID) {
+        return getChildByLocalID(*ref.localID);
+    }
+    return nullptr;
 }

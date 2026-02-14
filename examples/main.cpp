@@ -46,6 +46,20 @@ int main(){
     if(tree->get("height",height))
         std::cout<<"Tree Height: "<<height<<"\n";
 
+    auto goblin = scene->getNodeByGlobalID(777);
+
+    std::vector<std::shared_ptr<ValueNode>> loot;
+    if(goblin->getList("loot", loot)){
+        for(auto& item : loot){
+            std::cout << STDL::valueToString(item->value) << "\n";
+        }
+    }
+
+    int firstItem;
+    if(goblin->getListElement<int>("loot", 0, firstItem)){
+        std::cout << "First loot item: " << firstItem << "\n";
+    }
+
     auto enemy = std::make_shared<Node>();
     enemy->type="enemy";
     enemy->name="Orc";

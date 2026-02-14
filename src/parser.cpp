@@ -208,14 +208,9 @@ template<> struct Action<grammar::property>{
             
             if(std::holds_alternative<std::vector<std::shared_ptr<ValueNode>>>(lastVal)){
                 auto& vec = std::get<std::vector<std::shared_ptr<ValueNode>>>(lastVal);
-                if(vec.size() == 1){
-                    node->properties[key] = vec[0]->value;
-                } else {
-                    node->properties[key] = vec;
-                }
+                node->properties[key] = vec;
             }
             node->properties.erase("_last_value");
-        } else {
         }
     }
 };

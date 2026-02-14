@@ -6,6 +6,8 @@
 #include <memory>
 #include <optional>
 
+struct Scene;
+
 struct Node;
 using NodePtr = std::shared_ptr<Node>;
 
@@ -67,15 +69,7 @@ struct Node {
         return false;
     }
     
-    NodePtr resolveRef(const Ref& ref, Scene* scene){
-        if(ref.globalID && scene){
-            return scene->getNodeByGlobalID(*ref.globalID);
-        }
-        if(ref.localID){
-            return getChildByLocalID(*ref.localID);
-        }
-        return nullptr;
-    }
+    NodePtr resolveRef(const Ref& ref, Scene* scene);
     
     template<typename T>
     void set(const std::string& key, T val){
@@ -84,6 +78,27 @@ struct Node {
     
     void addChild(const NodePtr& child){
         children.push_back(child);
+    }
+
+    bool getList(const std::string& key, std::vector<std::shared_ptr<ValueNode>>& out){
+        auto it = properties.find(key);
+        if(it != properties.end() && std::holds_alternative<std::vector<std::shared_ptr<ValueNode>>>(it->second)){
+            out = std::get<std::vector<std::shared_ptr<ValueNode>>>(it->second);
+            return true;
+        }
+        return false;
+    }
+
+    template<typename T>
+    bool getListElement(const std::string& key, size_t index, T& out){
+        std::vector<std::shared_ptr<ValueNode>> list;
+        if(getList(key, list) && index < list.size()){
+            if(std::holds_alternative<T>(list[index]->value)){
+                out = std::get<T>(list[index]->value);
+                return true;
+            }
+        }
+        return false;
     }
 
 private:
@@ -126,4 +141,7 @@ private:
     }
 };
 
+namespace STDL {
+std::string valueToString(const Value& val);
+}
 using ScenePtr = std::shared_ptr<Scene>;

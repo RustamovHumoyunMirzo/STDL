@@ -32,7 +32,7 @@ node player MyPlayer @1
 }
 
 // Enemy node with local ID, no global ID
-node enemy Goblin #12
+node enemy Goblin #12 @777
 {
     health = 50
     aggressive = true

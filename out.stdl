@@ -3,41 +3,41 @@ node player MyPlayer @1
 {
   achievements = [0, 1, 2, 42, 23, "232", true, <#12>]
   another_list = [<mynode:MyNode @99>, <mynode:MyNode #12>]
-  armor = 72.65
-  escaped = "Hello\nWorld\t\"Quoted\""
-  health = -100
-  isBlocked = false
-  skin = "plyrnew.mat"
+  armor = [72.65]
+  escaped = ["Hello\nWorld\t\"Quoted\""]
+  health = [-100]
+  isBlocked = [false]
+  skin = ["plyrnew.mat"]
   node mynode MyNode #12
   {
-    active = true
-    description = "This is a nested node."
+    active = [true]
+    description = ["This is a nested node."]
   }
 }
-node enemy Goblin #12
+node enemy Goblin @777 #12
 {
-  aggressive = true
-  health = 50
+  aggressive = [true]
+  health = [50]
   loot = ["gold_coin", "dagger", <player:MyPlayer @1>]
 }
 node mynode MyNode @99
 {
-  description = "Global MyNode used in references"
-  value = 123.45
+  description = ["Global MyNode used in references"]
+  value = [123.45]
 }
 node environment Forest
 {
-  difficulty = 3
-  weather = "rainy"
+  difficulty = [3]
+  weather = ["rainy"]
   node tree Oak
   {
-    height = 15
-    leaves = true
+    height = [15]
+    leaves = [true]
   }
   node tree Pine
   {
-    height = 20
-    leaves = false
+    height = [20]
+    leaves = [false]
   }
 }
 node enemy Orc
