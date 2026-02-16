@@ -55,8 +55,8 @@ int main(){
         }
     }
 
-    int firstItem;
-    if(goblin->getListElement<int>("loot", 0, firstItem)){
+    std::string firstItem;
+    if(goblin->getListElement<std::string>("loot", 0, firstItem)){
         std::cout << "First loot item: " << firstItem << "\n";
     }
 
