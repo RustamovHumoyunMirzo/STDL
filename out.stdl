@@ -2,9 +2,10 @@ scene v1
 node player MyPlayer @1
 {
   achievements = [0, 1, 2, 42, 23, "232", true, <#12>]
-  another_list = [<mynode:MyNode @99>, <mynode:MyNode #12>]
+  another_list = [<mynode:MyNode @99>, <#12>]
   armor = [72.65]
   escaped = ["Hello\nWorld\t\"Quoted\""]
+  goblin = [<#12>]
   health = [-100]
   isBlocked = [false]
   skin = ["plyrnew.mat"]
@@ -19,6 +20,7 @@ node enemy Goblin @777 #12
   aggressive = [true]
   health = [50]
   loot = ["gold_coin", "dagger", <player:MyPlayer @1>]
+  player = [<player:MyPlayer @1>]
 }
 node mynode MyNode @99
 {

@@ -8,6 +8,7 @@ node player MyPlayer @1
     skin = "plyrnew.mat"
     isBlocked = false
     escaped = "Hello\nWorld\t\"Quoted\""
+    goblin = <enemy:Goblin #12>
 
     // Achievements include numbers, strings, booleans, and a local reference by local ID #12
     achievements = [
@@ -41,6 +42,7 @@ node enemy Goblin #12 @777
         "dagger",
         <player:MyPlayer @1>    // reference to player by global ID
     ]
+    player = <player:MyPlayer @1>
 }
 
 // Another node of type mynode with global ID
